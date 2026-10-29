@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Post & Comments Simulation - Toggle Footer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #18191a;
+            color: #e4e6eb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+
+        /* Top Bar for Accounts Manager */
+        .top-toolbar {
+            width: 100%;
+            max-width: 500px;
+            background: #242526;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .top-toolbar button {
+            background: #2d88ff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .fb-container {
+            width: 100%;
+            max-width: 500px;
+            background: #242526;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        /* Top Viewer Header */
+        .viewer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #393a3b;
+            background: #242526;
+        }
+
+        .viewer-title-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .viewer-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #555;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .viewer-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .viewer-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e4e6eb;
+            cursor: pointer;
+        }
+        .viewer-title:hover {
+            text-decoration: underline;
+        }
+
+        .viewer-icons {
+            display: flex;
+            gap: 16px;
+            font-size: 18px;
+            color: #b0b3b8;
+            cursor: pointer;
+        }
+
+        /* Stats Bar */
+        .post-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #b0b3b8;
+            border-bottom: 1px solid #393a3b;
+        }
+
+        .reactions-count {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .reaction-icons-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .fb-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            overflow: hidden;
+        }
+
+        .icon-like { background-color: #1877f2; }
+        .icon-love { background-color: #f33e58; }
+
+        .stats-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Header / Post Info */
+        .post-header {
+            padding: 12px 16px;
+        }
+
+        .post-author-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .author-name-wrap {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #e4e6eb;
+        }
+
+        .author-name:hover {
+            text-decoration: underline;
+        }
+
+        .verified-badge {
+            color: #2d88ff;
+            font-size: 13px;
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: #b0b3b8;
+            cursor: pointer;
+        }
+        .post-time:hover {
+            text-decoration: underline;
+        }
+
+        .post-url {
+            color: #2d88ff;
+            text-decoration: none;
+            font-size: 14px;
+            word-break: break-all;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Post Link Preview Card */
+        .post-preview-card {
+            border: 1px solid #393a3b;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #242526;
+            margin-top: 8px;
+            padding: 12px 16px;
+        }
+
+        .preview-domain {
+            font-size: 12px;
+            color: #b0b3b8;
+            text-transform: lowercase;
+            margin-bottom: 6px;
+        }
+
+        .preview-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #e4e6eb;
+            line-height: 1.4;
+        }
+
+        /* Filter Sort Bar */
+        .filter-bar {
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: #b0b3b8;
+            font-weight: 600;
+            cursor: pointer;
+            border-top: 1px solid #393a3b;
+            margin-top: 10px;
+        }
+
+        /* Comments List */
+        .comments-section {
+            padding: 0 16px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 8px;
+            position: relative;
+        }
+
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .comment-body-wrap {
+            display: flex;
+            flex-direction: column;
+            max-width: calc(100% - 40px);
+        }
+
+        .comment-bubble {
+            background: #3a3b3c;
+            border-radius: 18px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #e4e6eb;
+            line-height: 1.4;
+        }
+
+        .comment-author-name {
+            font-weight: 600;
+            font-size: 12px;
+            color: #e4e6eb;
+            margin-bottom: 2px;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .comment-author-name:hover {
+            text-decoration: underline;
+        }
+
+        .comment-time {
+            font-size: 11px;
+            color: #b0b3b8;
+            margin-right: 4px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .comment-time:hover {
+            text-decoration: underline;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #b0b3b8;
+            margin-top: 2px;
+            margin-right: 12px;
+        }
+
+        .comment-action-btn {
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            color: #b0b3b8;
+        }
+
+        .comment-action-btn:hover {
+            text-decoration: underline;
+        }
+
+        .comment-likes-count {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: #242526;
+            border: 1px solid #393a3b;
+            border-radius: 10px;
+            padding: 1px 6px;
+            font-size: 11px;
+            width: fit-content;
+            margin-right: auto;
+            margin-top: -8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+            color: #b0b3b8;
+            cursor: pointer;
+        }
+        .comment-likes-count:hover {
+            background: #3a3b3c;
+        }
+
+        /* Footer Restricted Bar (مطابق للصورة تماماً وقابل للتبديل عند الضغط المزدوج) */
+        .restricted-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-top: 1px solid #393a3b;
+            background: #242526;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .restricted-text {
+            font-size: 13px;
+            color: #e4e6eb;
+            line-height: 1.4;
+            text-align: right;
+        }
+
+        .restricted-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #b0b3b8;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-right: 10px;
+        }
+
+        /* Comment Input Box Footer (الوضع الفعال للكتابة) */
+        .comment-input-container {
+            display: none;
+            align-items: center;
+            padding: 8px 16px;
+            border-top: 1px solid #393a3b;
+            background: #242526;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .comment-input-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .comment-input-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            background: #3a3b3c;
+            border-radius: 20px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+            color: #e4e6eb;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #b0b3b8;
+        }
+
+        /* Modal Settings */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-box {
+            background: #242526;
+            color: #e4e6eb;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-box h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .modal-box label {
+            font-size: 12px;
+            color: #b0b3b8;
+        }
+
+        .modal-box input, .modal-box select {
+            padding: 8px;
+            border: 1px solid #393a3b;
+            background: #3a3b3c;
+            color: #e4e6eb;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .modal-buttons button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-save { background: #2d88ff; color: white; }
+        .btn-cancel { background: #3a3b3c; color: #e4e6eb; }
+        
+        .account-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #3a3b3c;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- شريط علوي لإدارة الحسابات والتبديل -->
+<div class="top-toolbar">
+    <span style="font-size: 13px; font-weight: bold;" id="activeAccountDisplay">الحساب الحالي: Ahmdoo Ahmado</span>
+    <button onclick="openAccountsManager()">إدارة الحسابات 👥</button>
+</div>
+
+<div class="fb-container">
+    <!-- Top Viewer Header -->
+    <div class="viewer-header">
+        <div class="viewer-title-area">
+            <div class="viewer-avatar" id="topHeaderAvatar" onclick="openProfileSettings('قناة المملكة', this, document.getElementById('topHeaderTitle'))">
+                <div style="width:100%;height:100%;background:#555;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">ق</div>
+            </div>
+            <span class="viewer-title" id="topHeaderTitle" onclick="openProfileSettings('قناة المملكة', document.getElementById('topHeaderAvatar'), this)">قناة المملكة - AlMamlaka TV</span>
+        </div>
+        <div class="viewer-icons">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="post-stats">
+        <div class="reactions-count">
+            <div class="reaction-icons-group">
+                <span class="fb-icon icon-love"><i class="fa-solid fa-heart" style="font-size: 9px;"></i></span>
+                <span class="fb-icon icon-like"><i class="fa-solid fa-thumbs-up" style="font-size: 9px;"></i></span>
+            </div>
+            <span>٥,٩ ألف</span>
+        </div>
+        <div class="stats-right">
+            <span>١٣٦ مشاركة</span>
+        </div>
+    </div>
+
+    <!-- Post Header / Author Row -->
+    <div class="post-header">
+        <div class="post-author-row">
+            <div class="author-info">
+                <div class="author-avatar" id="postAvatar" onclick="openProfileSettings('AlMamlak TV - قناة المملكة', this, document.getElementById('postAuthorName'))">
+                    <i class="fa-solid fa-tv"></i>
+                </div>
+                <div class="author-name-wrap">
+                    <span class="author-name" id="postAuthorName" onclick="openProfileSettings('AlMamlak TV - قناة المملكة', document.getElementById('postAvatar'), this)">
+                        AlMamlak TV - قناة المملكة 
+                        <i class="fa-solid fa-circle-check verified-badge"></i>
+                    </span>
+                    <span class="post-time" onclick="editTime(this)">٨٠ س · <i class="fa-solid fa-pen" style="font-size:10px;"></i> كاتب المنشور</span>
+                </div>
+            </div>
+            <i class="fa-solid fa-ellipsis" style="color: #b0b3b8; font-size: 16px; cursor: pointer;"></i>
+        </div>
+        <a href="#" class="post-url" id="postLinkTarget">https://almamlakatv.com/ar/url/A8GDrFqTrf</a>
+
+        <!-- Preview Card -->
+        <div class="post-preview-card">
+            <div class="preview-domain">almamlakatv.com</div>
+            <div class="preview-title">الشيباني: أصوات فتنة كانت تنتظر شرارة بين سوريا والأردن ووعينا حا...</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <span>الأكثر ملائمة</span>
+        <i class="fa-solid fa-angle-down" style="font-size: 11px;"></i>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section" id="commentsSection">
+        
+        <!-- Comment 1 -->
+        <div class="comment-item">
+            <div class="comment-avatar" onclick="openProfileSettings('ماجدة الحمود', this, this.parentElement.querySelector('.comment-author-name'))">م</div>
+            <div class="comment-body-wrap">
+                <div class="comment-bubble">
+                    <span class="comment-author-name" onclick="openProfileSettings('ماجدة الحمود', this.parentElement.parentElement.parentElement.querySelector('.comment-avatar'), this)">ماجدة الحمود <span class="comment-time" onclick="editTime(this)">٧٠ س</span></span>
+                    <div>سلم الفكر السليم العاقل لعل جميل الحسن وأمثاله يغلقون أفواه الفتنة التي فتحوها بكل اتجاه وهم يعلمون أن ما حدث غير مقصود من قلب وفكر الأردنيين جميعا وآننا أهل الشام كلنا قلب واحد رحم الله شهداء درعا واسكنهم فسيح جنانه</div>
+                </div>
+                <div class="comment-likes-count" onclick="editCommentReactions(this)">
+                    <span class="fb-icon icon-like" style="width:12px; height:12px;"><i class="fa-solid fa-thumbs-up" style="font-size:7px;"></i></span> <span class="like-num">٢٠</span>
+                </div>
+                <div class="comment-actions">
+                    <button class="comment-action-btn">رد</button>
+                    <span>·</span>
+                    <button class="comment-action-btn">إعجاب</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comment 2 -->
+        <div class="comment-item">
+            <div class="comment-avatar" style="background:#444;" onclick="openProfileSettings('أبو محمد الغندور', this, this.parentElement.querySelector('.comment-author-name'))">أب</div>
+            <div class="comment-body-wrap">
+                <div class="comment-bubble">
+                    <span class="comment-author-name" onclick="openProfileSettings('أبو محمد الغندور', this.parentElement.parentElement.parentElement.querySelector('.comment-avatar'), this)">أبو محمد الغندور <span class="comment-time" onclick="editTime(this)">٨٠ س</span></span>
+                    <div>تم تقييد من يمكنه التعليق على هذا المنشور بواسطة AlMamlak TV - قناة المملكة.</div>
+                </div>
+                <div class="comment-likes-count" onclick="editCommentReactions(this)">
+                    <span class="fb-icon icon-like" style="width:12px; height:12px;"><i class="fa-solid fa-thumbs-up" style="font-size:7px;"></i></span> <span class="like-num">٠</span>
+                </div>
+                <div class="comment-actions">
+                    <button class="comment-action-btn">رد</button>
+                    <span>·</span>
+                    <button class="comment-action-btn">إعجاب</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Footer Area: (تتغير بين رسالة التقييد وصندوق الكتابة عند النقر المزدوج DblClick) -->
+    <div id="footerToggleArea" ondblclick="toggleFooterMode()">
+        <!-- وضع رسالة التقييد المطابق للصورة -->
+        <div class="restricted-footer" id="restrictedFooterView">
+            <div class="restricted-text">تم تقييد من يمكنه التعليق على هذا المنشور بواسطة AlMamlak TV - قناة المملكة.</div>
+            <div class="restricted-icon"><i class="fa-solid fa-comment-slash"></i></div>
+        </div>
+
+        <!-- وضع صندوق كتابة التعليق -->
+        <div class="comment-input-container" id="inputContainerView">
+            <div class="comment-input-avatar" id="myInputAvatar" onclick="openAccountsManager()">ع</div>
+            <div class="input-wrapper">
+                <input type="text" id="commentInput" placeholder="اكتب تعليقاً باسم الحساب الحالي...">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: تعديل بيانات الحساب الفردي أو المنشور -->
+<div class="modal-overlay" id="profileModal">
+    <div class="modal-box">
+        <h3>تعديل بيانات العنصر</h3>
+        <label>الاسم:</label>
+        <input type="text" id="modalNameInput">
+        
+        <label>رابط التحويل عند النقر:</label>
+        <input type="text" id="modalUrlInput" placeholder="https://example.com">
+
+        <label>الصورة الشخصية (من ملفات الهاتف):</label>
+        <input type="file" id="modalImageInput" accept="image/*">
+
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeProfileModal()">إلغاء</button>
+            <button class="btn-save" onclick="saveProfileSettings()">حفظ</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: إدارة الحسابات المتعددة للتعليق -->
+<div class="modal-overlay" id="accountsModal">
+    <div class="modal-box">
+        <h3>إدارة الحسابات للتعليق</h3>
+        <div id="accountsListContainer"></div>
+        <hr style="border:0; border-top:1px solid #393a3b; margin: 10px 0;">
+        <h4 style="font-size: 14px; margin-bottom: 5px;">إضافة حساب جديد:</h4>
+        <label>اسم الحساب:</label>
+        <input type="text" id="newAccName" placeholder="مثال: محمد أحمد">
+        <label>رابط الحساب:</label>
+        <input type="text" id="newAccUrl" placeholder="https://facebook.com/...">
+        <label>الصورة الشخصية:</label>
+        <input type="file" id="newAccImg" accept="image/*">
+        
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeAccountsManager()">إغلاق</button>
+            <button class="btn-save" onclick="addNewAccount()">إضافة الحساب</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: تعديل تفاعلات التعليق (العدد والنوع) -->
+<div class="modal-overlay" id="reactionsModal">
+    <div class="modal-box">
+        <h3>تعديل تفاعلات التعليق</h3>
+        <label>اختر نوع التفاعل:</label>
+        <select id="modalReactionType">
+            <option value="like">إعجاب (👍)</option>
+            <option value="love">حب (❤️)</option>
+            <option value="haha">أضحكني (😆)</option>
+        </select>
+
+        <label>عدد التفاعلات:</label>
+        <input type="number" id="modalReactionNum" min="0" placeholder="مثال: 50">
+
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeReactionsModal()">إلغاء</button>
+            <button class="btn-save" onclick="saveCommentReactions()">حفظ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let accounts = [
+        { name: "Ahmdoo Ahmado", url: "#", avatarHtml: "ع", isDefault: true }
+    ];
+    let activeAccountIndex = 0;
+
+    let currentTargetAvatar = null;
+    let currentTargetName = null;
+    let currentTargetReactionBox = null;
+    let isInputMode = false;
+
+    // دالة التبديل عند النقر المزدوج (Double Click) بين رسالة التقييد وصندوق الكتابة
+    function toggleFooterMode() {
+        isInputMode = !isInputMode;
+        const restrictedView = document.getElementById('restrictedFooterView');
+        const inputView = document.getElementById('inputContainerView');
+
+        if (isInputMode) {
+            restrictedView.style.display = 'none';
+            inputView.style.display = 'flex';
+            document.getElementById('commentInput').focus();
+        } else {
+            restrictedView.style.display = 'flex';
+            inputView.style.display = 'none';
+        }
+    }
+
+    function openAccountsManager() {
+        renderAccountsList();
+        document.getElementById('accountsModal').style.display = 'flex';
+    }
+
+    function closeAccountsManager() {
+        document.getElementById('accountsModal').style.display = 'none';
+    }
+
+    function renderAccountsList() {
+        const container = document.getElementById('accountsListContainer');
+        container.innerHTML = '';
+        accounts.forEach((acc, index) => {
+            container.innerHTML += `
+                <div class="account-list-item">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width:24px; height:24px; border-radius:50%; background:#1877f2; color:white; display:flex; align-items:center; justify-content:center; font-size:10px; overflow:hidden;">
+                            ${typeof acc.avatarHtml === 'string' && acc.avatarHtml.startsWith('<img') ? acc.avatarHtml : acc.avatarHtml}
+                        </div>
+                        <span style="font-weight:${index === activeAccountIndex ? 'bold' : 'normal'}">${acc.name} ${index === activeAccountIndex ? '(نشط حالياً)' : ''}</span>
+                    </div>
+                    <div>
+                        ${index !== activeAccountIndex ? `<button onclick="switchActiveAccount(${index})" style="background:#2e8b57; color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:11px;">تفعيل</button>` : ''}
+                        ${accounts.length > 1 ? `<button onclick="deleteAccount(${index})" style="background:#d9534f; color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:11px; margin-right:4px;">حذف</button>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function switchActiveAccount(index) {
+        activeAccountIndex = index;
+        updateActiveAccountUI();
+        renderAccountsList();
+    }
+
+    function deleteAccount(index) {
+        accounts.splice(index, 1);
+        if (activeAccountIndex >= accounts.length) activeAccountIndex = 0;
+        updateActiveAccountUI();
+        renderAccountsList();
+    }
+
+    function addNewAccount() {
+        const name = document.getElementById('newAccName').value.trim();
+        const url = document.getElementById('newAccUrl').value.trim();
+        const fileInput = document.getElementById('newAccImg');
+
+        if (!name) {
+            alert('يرجى إدخال اسم الحساب');
+            return;
+        }
+
+        let avatarContent = name.charAt(0);
+
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                avatarContent = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+                accounts.push({ name, url: url || "#", avatarHtml: avatarContent });
+                document.getElementById('newAccName').value = '';
+                document.getElementById('newAccUrl').value = '';
+                fileInput.value = '';
+                renderAccountsList();
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            accounts.push({ name, url: url || "#", avatarHtml: avatarContent });
+            document.getElementById('newAccName').value = '';
+            document.getElementById('newAccUrl').value = '';
+            renderAccountsList();
+        }
+    }
+
+    function updateActiveAccountUI() {
+        const activeAcc = accounts[activeAccountIndex];
+        document.getElementById('activeAccountDisplay').innerText = `الحساب الحالي: ${activeAcc.name}`;
+        document.getElementById('commentInput').placeholder = `اكتب تعليقاً باسم ${activeAcc.name}...`;
+        
+        const myInputAvatar = document.getElementById('myInputAvatar');
+        myInputAvatar.innerHTML = activeAcc.avatarHtml;
+    }
+
+    function openProfileSettings(currentName, avatarElement, nameElement) {
+        currentTargetAvatar = avatarElement;
+        currentTargetName = nameElement;
+        
+        document.getElementById('modalNameInput').value = currentName.replace(/<[^>]*>?/gm, '').trim();
+        document.getElementById('modalUrlInput').value = avatarElement.dataset.url || "https://facebook.com";
+        document.getElementById('modalImageInput').value = "";
+        
+        document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profileModal').style.display = 'none';
+    }
+
+    function saveProfileSettings() {
+        const newName = document.getElementById('modalNameInput').value;
+        const newUrl = document.getElementById('modalUrlInput').value;
+        const fileInput = document.getElementById('modalImageInput');
+
+        if (currentTargetName) {
+            currentTargetName.childNodes[0].nodeValue = newName + " ";
+        }
+
+        if (currentTargetAvatar) {
+            currentTargetAvatar.dataset.url = newUrl;
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentTargetAvatar.innerHTML = `<img src="${e.target.result}" alt="Avatar">`;
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        if (currentTargetAvatar && newUrl) {
+            currentTargetAvatar.onclick = function(e) {
+                e.stopPropagation();
+                if(confirm("هل تريد الانتقال إلى الرابط: " + newUrl + "؟")) {
+                    window.open(newUrl, '_blank');
+                }
+            };
+        }
+        if (currentTargetName && newUrl) {
+            currentTargetName.onclick = function(e) {
+                e.stopPropagation();
+                if(confirm("هل تريد الانتقال إلى الرابط: " + newUrl + "؟")) {
+                    window.open(newUrl, '_blank');
+                }
+            };
+        }
+
+        closeProfileModal();
+    }
+
+    function editTime(timeElement) {
+        const newTime = prompt("أدخل الوقت الجديد (مثلاً: الآن، ٥ د، ١ س):", timeElement.innerText);
+        if (newTime !== null && newTime.trim() !== "") {
+            timeElement.innerText = newTime;
+        }
+    }
+
+    function editCommentReactions(reactionBox) {
+        currentTargetReactionBox = reactionBox;
+        const currentNum = reactionBox.querySelector('.like-num').innerText;
+        document.getElementById('modalReactionNum').value = currentNum === '٠' ? 0 : currentNum;
+        document.getElementById('reactionsModal').style.display = 'flex';
+    }
+
+    function closeReactionsModal() {
+        document.getElementById('reactionsModal').style.display = 'none';
+    }
+
+    function saveCommentReactions() {
+        const num = document.getElementById('modalReactionNum').value;
+        const type = document.getElementById('modalReactionType').value;
+
+        if (currentTargetReactionBox) {
+            currentTargetReactionBox.style.display = 'flex';
+            currentTargetReactionBox.querySelector('.like-num').innerText = num;
+            
+            let iconHtml = '<i class="fa-solid fa-thumbs-up" style="font-size:7px;"></i>';
+            let iconClass = 'icon-like';
+            
+            if (type === 'love') {
+                iconHtml = '<i class="fa-solid fa-heart" style="font-size:7px;"></i>';
+                iconClass = 'icon-love';
+            } else if (type === 'haha') {
+                iconHtml = '😆';
+                iconClass = '';
+            }
+
+            currentTargetReactionBox.querySelector('.fb-icon').className = `fb-icon ${iconClass}`;
+            currentTargetReactionBox.querySelector('.fb-icon').style.width = '12px';
+            currentTargetReactionBox.querySelector('.fb-icon').style.height = '12px';
+            if(type === 'haha') {
+                currentTargetReactionBox.querySelector('.fb-icon').style.fontSize = '8px';
+                currentTargetReactionBox.querySelector('.fb-icon').style.background = '#f7b125';
+            }
+            currentTargetReactionBox.querySelector('.fb-icon').innerHTML = iconHtml;
+        }
+        closeReactionsModal();
+    }
+
+    const commentInput = document.getElementById('commentInput');
+    const commentsSection = document.getElementById('commentsSection');
+
+    commentInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && commentInput.value.trim() !== '') {
+            const commentText = commentInput.value;
+            const activeAcc = accounts[activeAccountIndex];
+            
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-item';
+            newComment.innerHTML = `
+                <div class="comment-avatar" onclick="openProfileSettings('${activeAcc.name}', this, this.parentElement.querySelector('.comment-author-name'))">
+                    ${typeof activeAcc.avatarHtml === 'string' && activeAcc.avatarHtml.startsWith('<img') ? activeAcc.avatarHtml : activeAcc.avatarHtml}
+                </div>
+                <div class="comment-body-wrap">
+                    <div class="comment-bubble">
+                        <span class="comment-author-name" onclick="openProfileSettings('${activeAcc.name}', this.parentElement.parentElement.parentElement.querySelector('.comment-avatar'), this)">${activeAcc.name} <span class="comment-time" onclick="editTime(this)">الآن</span></span>
+                        <div>${escapeHtml(commentText)}</div>
+                    </div>
+                    <div class="comment-likes-count" onclick="editCommentReactions(this)">
+                        <span class="fb-icon icon-like" style="width:12px; height:12px;"><i class="fa-solid fa-thumbs-up" style="font-size:7px;"></i></span> <span class="like-num">١</span>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="comment-action-btn">رد</button>
+                        <span>·</span>
+                        <button class="comment-action-btn">إعجاب</button>
+                    </div>
+                </div>
+            `;
+            
+            commentsSection.appendChild(newComment);
+            commentInput.value = '';
+            newComment.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+</script>
+
+</body>
+</html>
